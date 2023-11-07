@@ -5,63 +5,87 @@
 #include <cctype>
 
 void Game::read_fen_string(std::string fen_string) {
-  int position = 0;
+  int row = 0;
+  int column = 0;
   for (int i = 0; i < fen_string.length(); i++) {
     char c = fen_string[i];
     if (isdigit(c)) {
-      int columns_to_skip = c - '0';
-      position += columns_to_skip;
+      int rows_to_skip = c - '0';
+      column += rows_to_skip;
       continue;
     }
 
+    std::cout << column << ", " << row << " | ";
+
+    int sprite_index = 0;
     switch (c) {
-      case '/':
-        continue;
       case 'p':
-        this->pieces.push_back(Piece(false, position, 'p'));
+        sprite_index = 2;
         break;
       case 'P':
-        this->pieces.push_back(Piece(true, position, 'P'));
+        sprite_index = 3;
         break;
       case 'b':
-        this->pieces.push_back(Piece(false, position, 'b'));
+        sprite_index = 0;
         break;
       case 'B':
-        this->pieces.push_back(Piece(true, position, 'B'));
-        break;
-      case 'n':
-        this->pieces.push_back(Piece(false, position, 'n'));
-        break;
-      case 'N':
-        this->pieces.push_back(Piece(true, position, 'N'));
-        break;
-      case 'r':
-        this->pieces.push_back(Piece(false, position, 'r'));
-        break;
-      case 'R':
-        this->pieces.push_back(Piece(true, position, 'R'));
+        sprite_index = 1;
         break;
       case 'k':
-        this->pieces.push_back(Piece(false, position, 'k'));
+        sprite_index = 4;
         break;
       case 'K':
-        this->pieces.push_back(Piece(true, position, 'K'));
+        sprite_index = 5;
+        break;
+      case 'n':
+        sprite_index = 6;
+        break;
+      case 'N':
+        sprite_index = 7;
         break;
       case 'q':
-        this->pieces.push_back(Piece(false, position, 'q'));
+        sprite_index = 10;
         break;
       case 'Q':
-        this->pieces.push_back(Piece(true, position, 'Q'));
+        sprite_index = 11;
+        break;
+      case 'r':
+        sprite_index = 8;
+        break;
+      case 'R':
+        sprite_index = 9;
         break;
     }
 
-    position += 1;
+    this->pieces.push_back(Piece(isupper(c), column, row, c, sprite_index));
+
+    column++;
+    if (column > 8) {
+      row++;
+      column = 0;
+    }
   } 
+}
+
+void Game::load_piece_sprites() {
+  this->piece_sprites[0] = LoadTexture("assets/bb.png");
+  this->piece_sprites[1] = LoadTexture("assets/wb.png");
+  this->piece_sprites[2] = LoadTexture("assets/bp.png");
+  this->piece_sprites[3] = LoadTexture("assets/wp.png");
+  this->piece_sprites[4] = LoadTexture("assets/bk.png");
+  this->piece_sprites[5] = LoadTexture("assets/wk.png");
+  this->piece_sprites[6] = LoadTexture("assets/bn.png");
+  this->piece_sprites[7] = LoadTexture("assets/wn.png");
+  this->piece_sprites[8] = LoadTexture("assets/br.png");
+  this->piece_sprites[9] = LoadTexture("assets/wr.png");
+  this->piece_sprites[10] = LoadTexture("assets/bq.png");
+  this->piece_sprites[11] = LoadTexture("assets/wq.png");
 }
 
 Game::Game(std::string fen_string) {
   std::cout << "Starting chess game with FEN: " << fen_string << std::endl;
   this->read_fen_string(fen_string);
+  this->load_piece_sprites();
 }
 
 std::vector<Piece> Game::getPieces() {
@@ -82,24 +106,24 @@ void drawChessBoard(int window_width, int window_height) {
   }
 }
 
-void drawPieces(int window_width, int window_height, Game *game) {
+void drawPieces(int window_width, int window_height, Game *game, Piece *piece) {
   float grid_width = (float)window_width / 8;
   float grid_height = (float)window_height / 8;
 
-  int row = 0;
-  int column = 0;
+  if (piece != 0 && piece->getType() != '0' && IsMouseButtonDown(0)) {
+    DrawTexture(game->piece_sprites[piece->getSpritePosition()], GetMouseX() - 30, GetMouseY() - 30, WHITE);
+  }
+
   for (int i = 0; i < game->getPieces().size(); i++) {
     Piece p = game->getPieces()[i];
-    std::string piece = "";
-    piece.push_back(p.getType());
 
-    DrawText(piece.c_str(), row * grid_width + (grid_width / 2 - 10), column * grid_height + (grid_height / 2 - 10), 20, BLACK);
-
-    row++;
-    column = std::floor(p.getPosition() / 8);
-
-    if (row % 8 == 0) {
-      row = 0;
+    if (piece != 0 
+      && piece->getType() == p.getType() 
+      && piece->getPositionY() == p.getPositionY()
+      && piece->getPositionX() == p.getPositionX()
+      && IsMouseButtonDown(0)) {
+      continue;
     }
+    DrawTexture(game->piece_sprites[p.getSpritePosition()], grid_width * p.getPositionX(), grid_height * p.getPositionY(), WHITE);
   }
 }
