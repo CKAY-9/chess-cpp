@@ -109,11 +109,7 @@ void drawChessBoard(int window_width, int window_height) {
 void drawPieces(int window_width, int window_height, Game *game, Piece *piece) {
   float grid_width = (float)window_width / 8;
   float grid_height = (float)window_height / 8;
-
-  if (piece != 0 && piece->getType() != '0' && IsMouseButtonDown(0)) {
-    DrawTexture(game->piece_sprites[piece->getSpritePosition()], GetMouseX() - 30, GetMouseY() - 30, WHITE);
-  }
-
+  
   for (int i = 0; i < game->getPieces().size(); i++) {
     Piece p = game->getPieces()[i];
 
@@ -126,4 +122,9 @@ void drawPieces(int window_width, int window_height, Game *game, Piece *piece) {
     }
     DrawTexture(game->piece_sprites[p.getSpritePosition()], grid_width * p.getPositionX(), grid_height * p.getPositionY(), WHITE);
   }
+
+  if (piece != 0 && piece->getType() != '0' && IsMouseButtonDown(0)) {
+    DrawTexture(game->piece_sprites[piece->getSpritePosition()], GetMouseX() - 30, GetMouseY() - 30, WHITE);
+  }
+
 }

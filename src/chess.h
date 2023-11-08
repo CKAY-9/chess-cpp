@@ -33,6 +33,7 @@ class Game {
 void drawChessBoard(int window_width, int window_height);
 void drawPieces(int window_width, int window_height, Game *game, Piece *piece);
 
+bool can_piece_move_to_position(int new_column, int new_row, Game *game, Piece *piece, Piece *target_piece);
 Piece getPieceAtGrid(int column, int row, Game *game);
 int getPieceAtGridIndex(int column, int row, Game *game);
 Piece getPieceAtMousePosition(int window_width, int window_height, Game *game);
