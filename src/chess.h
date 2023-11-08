@@ -22,12 +22,17 @@ class Piece {
 
 class Game {
   public:
+    int current_move = 0;
+
+    std::vector<Sound> sounds;
     std::vector<Piece> pieces;
     Texture2D piece_sprites[12] = {};
+
     Game(std::string fen_string);
-    std::vector<Piece> getPieces();
     void read_fen_string(std::string fen_string);
+
     void load_piece_sprites(); 
+    void load_sounds();
 };
 
 void drawChessBoard(int window_width, int window_height);

@@ -45,9 +45,18 @@ bool can_piece_move_to_position(int new_column, int new_row, Game *game, Piece *
   if (!err_slope) {
     move_slope = (float)move_y / (float)move_x; 
   }
+  
+
+  // pawn movement
+  bool white_check = piece->isWhite() && (piece->getPositionY() == 6);
+  bool black_check = !piece->isWhite() && (piece->getPositionY() == 1);
 
   switch (tolower(piece->getType())) {
     case 'p':
+      if (move_y == 2 && move_x == 0 && (white_check || black_check)) {
+        return true;
+      }
+
       if (move_y > 1) {
         return false;
       }
@@ -103,8 +112,8 @@ bool can_piece_move_to_position(int new_column, int new_row, Game *game, Piece *
 }
 
 Piece getPieceAtGrid(int column, int row, Game *game) {
-  for (int i = 0; i < game->getPieces().size(); i++) {
-    Piece p = game->getPieces()[i];
+  for (int i = 0; i < game->pieces.size(); i++) {
+    Piece p = game->pieces[i];
     if (p.getPositionX() == column && p.getPositionY() == row) {
       return p;
     }
@@ -113,8 +122,8 @@ Piece getPieceAtGrid(int column, int row, Game *game) {
 }
 
 int getPieceAtGridIndex(int column, int row, Game *game) {
-  for (int i = 0; i < game->getPieces().size(); i++) {
-    Piece p = game->getPieces()[i];
+  for (int i = 0; i < game->pieces.size(); i++) {
+    Piece p = game->pieces[i];
     if (p.getPositionX() == column && p.getPositionY() == row) {
       return i;
     }

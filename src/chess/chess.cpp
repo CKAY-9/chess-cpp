@@ -82,14 +82,16 @@ void Game::load_piece_sprites() {
   this->piece_sprites[11] = LoadTexture("assets/wq.png");
 }
 
+void Game::load_sounds() {
+  this->sounds.push_back(LoadSound("assets/capture.mp3"));
+  this->sounds.push_back(LoadSound("assets/move-self.mp3"));
+}
+
 Game::Game(std::string fen_string) {
   std::cout << "Starting chess game with FEN: " << fen_string << std::endl;
   this->read_fen_string(fen_string);
   this->load_piece_sprites();
-}
-
-std::vector<Piece> Game::getPieces() {
-  return this->pieces;
+  this->load_sounds();
 }
 
 void drawChessBoard(int window_width, int window_height) {
@@ -110,8 +112,8 @@ void drawPieces(int window_width, int window_height, Game *game, Piece *piece) {
   float grid_width = (float)window_width / 8;
   float grid_height = (float)window_height / 8;
   
-  for (int i = 0; i < game->getPieces().size(); i++) {
-    Piece p = game->getPieces()[i];
+  for (int i = 0; i < game->pieces.size(); i++) {
+    Piece p = game->pieces[i];
 
     if (piece != 0 
       && piece->getType() == p.getType() 
