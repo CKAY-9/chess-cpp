@@ -1,5 +1,6 @@
 #include "../chess.h"
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
 
@@ -31,7 +32,53 @@ int Piece::getSpritePosition() {
   return this->sprite_position;
 }
 
-bool can_piece_move_to_position(int new_column, int new_row, Game *game, Piece *piece, Piece *target_piece) {
+bool checkRowCollision(int row, Game *game, Piece *piece, int new_col) {
+  int column_pos_diff = std::abs(piece->getPositionX() - new_col);
+
+  if (column_pos_diff <= 1) {
+    return true;
+  }
+
+  int starting_position = piece->getPositionX() + 1;
+  int ending_position = new_col;
+  if (new_col < piece->getPositionX()) {
+    starting_position = new_col + 1;
+    ending_position = piece->getPositionX();
+  }
+  
+  for (int col = starting_position; col < ending_position + 1; col++) {
+    Piece p = getPieceAtGrid(col, row, game);
+    if (p.getType() != '0') {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool checkColumnCollision(int column, Game *game, Piece *piece, int new_row) {
+  int row_pos_diff = std::abs(piece->getPositionY() - new_row);
+
+  if (row_pos_diff <= 1) {
+    return true;
+  }
+
+  int starting_position = piece->getPositionY() + 1;
+  int ending_position = new_row;
+  if (new_row < piece->getPositionY()) {
+    starting_position = new_row + 1;
+    ending_position = piece->getPositionY();
+  }
+
+  for (int row = starting_position; row  < ending_position + 1; row++) {
+    Piece p = getPieceAtGrid(column, row, game);
+    if (p.getType() != '0') {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool canPieceMoveToPosition(int new_column, int new_row, Game *game, Piece *piece, Piece *target_piece) {
   int move_x = abs(new_column - piece->getPositionX());
   if (piece->getPositionX() > new_column) {
     move_x = abs(piece->getPositionX() - new_column);
@@ -106,6 +153,11 @@ bool can_piece_move_to_position(int new_column, int new_row, Game *game, Piece *
       if (move_slope != 1 && move_slope != 0) {
         return false; 
       }
+  }
+
+  if (checkRowCollision(piece->getPositionY(), game, piece, new_column) 
+    || checkColumnCollision(piece->getPositionX(), game, piece, new_row)) {
+    return false;
   }
 
   return true;
